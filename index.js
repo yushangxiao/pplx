@@ -1,11 +1,14 @@
 const express = require("express");
 const { io } = require("socket.io-client");
+const { SocksProxyAgent } = require('socks-proxy-agent');
 const { v4: uuidv4 } = require("uuid");
 const { ProxyAgent } = require("proxy-agent");
-const agent = new ProxyAgent();
+const proxy =  process.env.PROXY;
+// 创建 SocksProxyAgent  
+const agent = new SocksProxyAgent(proxy);  
 
 const app = express();
-const port = process.env.PORT || 8081;
+const port = process.env.PORT || 7860;
 
 var opts = {
 	agent: agent,
@@ -27,7 +30,16 @@ var opts = {
 	},
 };
 
-app.post("/v1/messages", (req, res) => {
+app.post("/hf/v1/messages", (req, res) => {
+    const apiKey = req.headers['x-api-key'];
+
+    // Retrieve the token from environment variables
+    const expectedToken = process.env.TOKEN;
+
+    // Check if the provided API key matches the expected token
+    if (!apiKey || apiKey !== expectedToken) {
+        return res.status(403).json({ error: 'Forbidden: Invalid API Key' });
+    }
 	req.rawBody = "";
 	req.setEncoding("utf8");
 
