@@ -111,7 +111,7 @@ app.post("/hf/v1/messages", (req, res) => {
                         return msg.content
                     })
                     .join("\n\n");
-		let mondel=jsonBody.model
+		let mondel=jsonBody.model;
                 let msgid = uuidv4();
 				// send message start
 				res.write(
