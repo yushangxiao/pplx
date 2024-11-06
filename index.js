@@ -111,7 +111,7 @@ app.post("/hf/v1/messages", (req, res) => {
                         return msg.content
                     })
                     .join("\n\n");
-
+		let mondel=jsonBody.model
                 let msgid = uuidv4();
 				// send message start
 				res.write(
@@ -122,7 +122,7 @@ app.post("/hf/v1/messages", (req, res) => {
 							type: "message",
 							role: "assistant",
 							content: [],
-							model: "claude-3-opus-20240229",
+							model: model,
 							stop_reason: null,
 							stop_sequence: null,
 							usage: { input_tokens: 8, output_tokens: 1 },
