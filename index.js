@@ -195,11 +195,11 @@ app.post("/hf/v1/messages", (req, res) => {
 									}
 								});
 								if (serch_result){
-									serch_result.forEach((item) => {
+									serch_result.forEach((item, index) => {
 										chunkJSON = JSON.stringify({
 											type: "content_block_delta",
 											index: 0,
-											delta: { type: "text_delta", text: "\n\n"+item["name"] + "\n" + item["snippet"] + "\n" + item["url"]},
+											delta: { type: "text_delta", text: "\n\n"+ (index + 1)+item["name"] + "\n" + item["snippet"] + "\n" + item["url"]},
 										});
 										res.write(createEvent("content_block_delta", chunkJSON));
 									});
