@@ -141,10 +141,11 @@ app.post("/hf/v1/messages", (req, res) => {
                         .emitWithAck("perplexity_ask", previousMessages, {
                             "version": "2.9",
                             "source": "default",
+			    "sources":["web"]
                             "attachments": [],
                             "language": "en-GB",
                             "timezone": "Europe/London",
-                            "search_focus": "writing",
+                            "search_focus": "internet",
                             "frontend_uuid": uuidv4(),
                             "mode": "concise",
                             "is_related_query": false,
