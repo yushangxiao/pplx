@@ -1,9 +1,11 @@
+require('dotenv').config(); 
 const express = require("express");
 const { io } = require("socket.io-client");
 const { SocksProxyAgent } = require('socks-proxy-agent');
 const { v4: uuidv4 } = require("uuid");
 const { ProxyAgent } = require("proxy-agent");
 const proxy =  process.env.PROXY;
+
 // 创建 SocksProxyAgent  
 const agent = new SocksProxyAgent(proxy);  
 
