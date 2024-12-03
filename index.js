@@ -141,7 +141,7 @@ app.post("/hf/v1/messages", (req, res) => {
                         .emitWithAck("perplexity_ask", previousMessages, {
                             "version": "2.9",
                             "source": "default",
-			    "sources":["web"]
+			    "sources":["web"],
                             "attachments": [],
                             "language": "en-GB",
                             "timezone": "Europe/London",
