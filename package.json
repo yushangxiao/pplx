@@ -9,10 +9,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "dotenv": "^16.4.6",
     "express": "^4.19.2",
     "proxy-agent": "^6.4.0",
     "socket.io-client": "^4.7.5",
-    "uuid": "^9.0.1",
-    "socks-proxy-agent":"^8.0.4"
+    "socks-proxy-agent": "^8.0.4",
+    "uuid": "^9.0.1"
   }
 }
