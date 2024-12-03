@@ -79,6 +79,11 @@ app.post("/hf/v1/messages", (req, res) => {
 				let userMessage = [{ question: "", answer: "" }];
 				let userQuery = "";
 				let lastUpdate = true;
+				let model=jsonBody.model;
+				let open_serch=false;
+				if (model.includes("search")) {
+					open_serch=true;
+				}
 				if (jsonBody.system) {
 					// 把系统消息加入messages的首条
 					jsonBody.messages.unshift({ role: "system", content: jsonBody.system });
@@ -111,7 +116,7 @@ app.post("/hf/v1/messages", (req, res) => {
                         return msg.content
                     })
                     .join("\n\n");
-		let mondel=jsonBody.model;
+
                 let msgid = uuidv4();
 				// send message start
 				res.write(
@@ -136,15 +141,15 @@ app.post("/hf/v1/messages", (req, res) => {
                 var socket = io("wss://www.perplexity.ai/", opts);
 
                 socket.on("connect", function () {
-                    console.log(" > [Connected]");
-                    socket
-                        .emitWithAck("perplexity_ask", previousMessages, {
+					let ask_json;
+					if (open_serch){
+						ask_json={
                             "version": "2.9",
                             "source": "default",
-			    "sources":["web"],
+			    			"sources":["web"],
                             "attachments": [],
-                            "language": "en-GB",
-                            "timezone": "Europe/London",
+                            "language": "en-US",
+                            "timezone": "America/Los_Angeles",
                             "search_focus": "internet",
                             "frontend_uuid": uuidv4(),
                             "mode": "concise",
@@ -154,10 +159,54 @@ app.post("/hf/v1/messages", (req, res) => {
                             "frontend_context_uuid": uuidv4(),
                             "prompt_source": "user",
                             "query_source": "home"
-                        })
+                        }}
+					else{
+						ask_json={
+                            "version": "2.9",
+                            "source": "default",
+                            "attachments": [],
+                            "language": "en-US",
+                            "timezone": "America/Los_Angeles",
+                            "search_focus": "writing",
+                            "frontend_uuid": uuidv4(),
+                            "mode": "concise",
+                            "is_related_query": false,
+                            "is_default_related_query": false,
+                            "visitor_id": uuidv4(),
+                            "frontend_context_uuid": uuidv4(),
+                            "prompt_source": "user",
+                            "query_source": "home"
+                        }
+					}
+                    console.log(" > [Connected]");
+                    socket
+                        .emitWithAck("perplexity_ask", previousMessages, ask_json)
                         .then((response) => {
                             
                             console.log(response);
+							let response_json=JSON.parse(response)["text"];
+							let text_json=JSON.parse(response_json);
+							let serch_result;
+							// 遍历text_json数组
+							try{
+								text_json.forEach((item) => {
+									if (item["step_type"]== "SEARCH_RESULTS") {
+										serch_result=item["search_results"]["content"]["web_results"];
+									}
+								});
+								if (serch_result){
+									serch_result.forEach((item) => {
+										chunkJSON = JSON.stringify({
+											type: "content_block_delta",
+											index: 0,
+											delta: { type: "text_delta", text: "\n\n"+item["name"] + "\n" + item["snippet"] + "\n" + item["url"]},
+										});
+										res.write(createEvent("content_block_delta", chunkJSON));
+									});
+								}
+							}catch(e){
+								console.log(e);
+							}
                             res.write(createEvent("content_block_stop", { type: "content_block_stop", index: 0 }));
                             res.write(
                                 createEvent("message_delta", {
